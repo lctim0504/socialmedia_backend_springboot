@@ -20,9 +20,8 @@ public class Post {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @ManyToOne
-    @JoinColumn(name = "author_id")
-    private User author;
+    @Column(name = "author_id")
+    private int authorId;
 
     @OneToMany(mappedBy = "post")
     private List<Comment> comments;
@@ -43,6 +42,14 @@ public class Post {
 
     public int getId() {
         return this.id;
+    }
+
+    public int getAuthorId() {
+        return this.authorId;
+    }
+
+    public void setAuthorId(int authorId) {
+        this.authorId = authorId;
     }
 
     public void setId(int id) {
@@ -73,13 +80,8 @@ public class Post {
         this.updatedAt = updatedAt;
     }
 
-    public User getAuthor() {
-        return this.author;
-    }
 
-    public void setAuthor(User author) {
-        this.author = author;
-    }
+
 
     public List<Comment> getComments() {
         return this.comments;

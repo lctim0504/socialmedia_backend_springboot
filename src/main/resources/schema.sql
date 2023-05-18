@@ -100,10 +100,12 @@ CREATE TABLE IF NOT EXISTS post_shares (
 CREATE TABLE IF NOT EXISTS user_friends (
     user_id INT,
     friend_id INT,
+    status VARCHAR(20),
     PRIMARY KEY (user_id, friend_id),
     FOREIGN KEY (user_id) REFERENCES user1 (id),
     FOREIGN KEY (friend_id) REFERENCES user1 (id)
 );
+
 
 -- 建立 UserFollowers 表
 CREATE TABLE IF NOT EXISTS user_followers (

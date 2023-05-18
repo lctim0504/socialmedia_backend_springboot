@@ -1,4 +1,4 @@
-package com.example.demo.user.repos;
+package com.example.demo.user.dao;
 
 import java.util.List;
 
@@ -8,15 +8,11 @@ import org.springframework.stereotype.Repository;
 import com.example.demo.model.User;
 
 @Repository
-public interface UserRepository extends JpaRepository<User, Integer> {
+public interface UserDao extends JpaRepository<User, Integer> {
 
     User findByUsername(String username);
 
     User findByEmail(String email);
 
-    // List<User> findByAgeGreaterThan(int age);
 
-    // List<User> findByFirstNameContainsIgnoreCase(String keyword);
-
-    // 其他自定義查詢方法...
 }

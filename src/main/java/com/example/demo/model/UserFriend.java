@@ -1,5 +1,7 @@
 package com.example.demo.model;
 
+import com.example.demo.enums.FriendStatus;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -16,6 +18,9 @@ public class UserFriend {
     @ManyToOne
     @JoinColumn(name = "friend_id")
     private User friend;
+
+    @Enumerated(EnumType.STRING)
+    private FriendStatus status;
 
     // Constructors, getters, setters, and other methods
 
@@ -35,5 +40,11 @@ public class UserFriend {
         this.friend = friend;
     }
 
-}
+    public FriendStatus getStatus() {
+        return this.status;
+    }
 
+    public void setStatus(FriendStatus status) {
+        this.status = status;
+    }
+}

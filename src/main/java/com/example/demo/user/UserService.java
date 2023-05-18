@@ -3,14 +3,14 @@ package com.example.demo.user;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.dto.UserDto;
+import com.example.demo.enums.FriendStatus;
 import com.example.demo.model.User;
 import com.example.demo.model.UserFollower;
 import com.example.demo.model.UserFriend;
-import com.example.demo.user.repos.UserFollowerRepository;
-import com.example.demo.user.repos.UserFriendRepository;
-import com.example.demo.user.repos.UserRepository;
+import com.example.demo.user.dao.UserDao;
+import com.example.demo.user.dao.UserFollowerDao;
+import com.example.demo.user.dao.UserFriendDao;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -18,12 +18,12 @@ import java.util.stream.Collectors;
 @Service
 public class UserService {
 
-    private final UserRepository userRepository;
-    private final UserFriendRepository userFriendRepository;
-    private final UserFollowerRepository userFollowerRepository;
+    private final UserDao userRepository;
+    private final UserFriendDao userFriendRepository;
+    private final UserFollowerDao userFollowerRepository;
 
-    public UserService(UserRepository userRepository, UserFriendRepository userFriendRepository,
-            UserFollowerRepository userFollowerRepository) {
+    public UserService(UserDao userRepository, UserFriendDao userFriendRepository,
+            UserFollowerDao userFollowerRepository) {
         this.userRepository = userRepository;
         this.userFriendRepository = userFriendRepository;
         this.userFollowerRepository = userFollowerRepository;
@@ -47,29 +47,25 @@ public class UserService {
 
     public UserDto updateUser(int id, UserDto userDto) {
         Optional<User> optionalUser = userRepository.findById(id);
-        if (optionalUser.isPresent()) {
-            User user = optionalUser.get();
+        optionalUser.ifPresent(user -> {
             user.setUsername(userDto.getUsername());
             user.setEmail(userDto.getEmail());
             user.setPassword(userDto.getPassword());
-            User updatedUser = userRepository.save(user);
-            return mapUserToDto(updatedUser);
-        }
-        return null;
+            userRepository.save(user);
+        });
+        return optionalUser.map(this::mapUserToDto).orElse(null);
     }
 
     public boolean deleteUser(int id) {
         Optional<User> optionalUser = userRepository.findById(id);
-        if (optionalUser.isPresent()) {
-            userRepository.delete(optionalUser.get());
-            return true;
-        }
-        return false;
+        optionalUser.ifPresent(user -> userRepository.delete(user));
+        return optionalUser.isPresent();
     }
 
     public List<UserDto> getFriends(int userId) {
-        List<UserFriend> friends = userFriendRepository.findByUserId(userId);
-        return friends.stream()
+        List<UserFriend> userFriends = userFriendRepository.findByUserIdOrFriendIdAndStatus(userId,
+                FriendStatus.ACCEPTED);
+        return userFriends.stream()
                 .map(userFriend -> {
                     UserDto userDto = new UserDto();
                     userDto.setId(userFriend.getFriend().getId());
@@ -79,6 +75,14 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
+    /*
+     * optionalUser.get() 是用於從 Optional 對象中取得實際的 User
+     * 物件。Optional 是一個容器類型，用於處理可能為空（null）的值。透過 optionalUser.get() 方法，
+     * 我們可以從 Optional 對象中提取實際的非空值，以便在後續程式碼中使用。
+     * 
+     * Optional<User> 對象並不是 User 類型的實例，而是一個包裹了可能為空的 User 物件的容器。
+     * 因此我們需要透過 optionalUser.get() 方法來取得實際的 User 物件，然後再將其設定到 UserFriend 對象中。
+     */
     public void addFriend(int userId, int friendId) {
         Optional<User> optionalUser = userRepository.findById(userId);
         Optional<User> optionalFriend = userRepository.findById(friendId);
@@ -89,6 +93,7 @@ public class UserService {
             UserFriend userFriend = new UserFriend();
             userFriend.setUser(user);
             userFriend.setFriend(friend);
+            userFriend.setStatus(FriendStatus.PENDING);
             userFriendRepository.save(userFriend);
         }
     }

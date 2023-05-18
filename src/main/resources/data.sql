@@ -54,12 +54,12 @@ INSERT INTO post_shares (post_id, user_id) VALUES
   (4, 5),
   (5, 1);
 
-INSERT INTO user_friends (user_id, friend_id) VALUES
-  (1, 2),
-  (1, 3),
-  (2, 3),
-  (2, 4),
-  (3, 4);
+INSERT INTO user_friends (user_id, friend_id, status) VALUES
+  (1, 2, 'PENDING'),
+  (1, 3, 'ACCEPTED'),
+  (2, 3, 'ACCEPTED'),
+  (2, 4, 'REJECTED'),
+  (3, 4, 'PENDING');
 
 INSERT INTO user_followers (user_id, follower_id) VALUES
   (1, 2),

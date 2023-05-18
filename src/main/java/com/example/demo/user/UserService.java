@@ -11,8 +11,14 @@ import com.example.demo.user.dao.UserDao;
 import com.example.demo.user.dao.UserFollowerDao;
 import com.example.demo.user.dao.UserFriendDao;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,6 +35,7 @@ public class UserService {
         this.userFollowerRepository = userFollowerRepository;
     }
 
+    /* 用戶相關 --------------------------------------- */
     public List<UserDto> getAllUsers() {
         List<User> users = userRepository.findAll();
         return mapUsersToDto(users);
@@ -62,6 +69,7 @@ public class UserService {
         return optionalUser.isPresent();
     }
 
+    /* 好友相關 --------------------------------------- */
     public List<UserDto> getFriends(int userId) {
         List<UserFriend> userFriends = userFriendRepository.findByUserIdOrFriendIdAndStatus(userId,
                 FriendStatus.ACCEPTED);
@@ -75,14 +83,6 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
-    /*
-     * optionalUser.get() 是用於從 Optional 對象中取得實際的 User
-     * 物件。Optional 是一個容器類型，用於處理可能為空（null）的值。透過 optionalUser.get() 方法，
-     * 我們可以從 Optional 對象中提取實際的非空值，以便在後續程式碼中使用。
-     * 
-     * Optional<User> 對象並不是 User 類型的實例，而是一個包裹了可能為空的 User 物件的容器。
-     * 因此我們需要透過 optionalUser.get() 方法來取得實際的 User 物件，然後再將其設定到 UserFriend 對象中。
-     */
     public void addFriend(int userId, int friendId) {
         Optional<User> optionalUser = userRepository.findById(userId);
         Optional<User> optionalFriend = userRepository.findById(friendId);
@@ -103,6 +103,7 @@ public class UserService {
         optionalUserFriend.ifPresent(userFriendRepository::delete);
     }
 
+    /* 追蹤相關 --------------------------------------- */
     public List<UserDto> getFollowers(int userId) {
         List<UserFollower> followers = userFollowerRepository.findByUserId(userId);
         return followers.stream()
@@ -146,6 +147,7 @@ public class UserService {
         optionalUserFollower.ifPresent(userFollowerRepository::delete);
     }
 
+    /* Map映射 --------------------------------------- */
     private UserDto mapUserToDto(User user) {
         UserDto userDto = new UserDto();
         userDto.setId(user.getId());

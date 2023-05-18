@@ -3,6 +3,7 @@ import jakarta.persistence.*;
 
 @Entity
 @Table(name = "post_likes")
+@IdClass(PostLikesId.class)
 public class PostLikes {
 
     @Id

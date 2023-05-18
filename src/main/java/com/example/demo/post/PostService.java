@@ -1,32 +1,48 @@
 package com.example.demo.post;
 
-import com.example.demo.MapToDto;
+import com.example.demo.CustomException;
+import com.example.demo.dto.CommentDto;
 import com.example.demo.dto.PostDto;
+import com.example.demo.model.Comment;
 import com.example.demo.model.Post;
+import com.example.demo.model.PostLikes;
 import com.example.demo.model.User;
+import com.example.demo.post.dao.CommentDao;
+import com.example.demo.post.dao.PostDao;
+import com.example.demo.post.dao.PostLikeDao;
+import com.example.demo.post.dao.PostShareDao;
 import com.example.demo.user.dao.UserDao;
 
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import javax.naming.NameNotFoundException;
 
 @Service
 public class PostService {
 
     private final PostDao postDao;
+    private final PostLikeDao postLikeDao;
+    private final PostShareDao postShareDao;
     private final UserDao userDao;
-    private final MapToDto mapToDto;
+    private final CommentDao commentDao;
 
     public PostService(
             PostDao postDao,
+            PostLikeDao postLikeDao,
+            PostShareDao postShareDao,
             UserDao userDao,
-            MapToDto mapToDto) {
+            CommentDao commentDao) {
         this.postDao = postDao;
+        this.postLikeDao = postLikeDao;
+        this.postShareDao = postShareDao;
         this.userDao = userDao;
-        this.mapToDto = mapToDto;
+        this.commentDao = commentDao;
     }
 
     public PostDto getPostById(int postId) {
@@ -85,4 +101,61 @@ public class PostService {
         post.setAuthorId(postDto.getAuthorId());
         return post;
     }
+
+    public void likePost(int postId, int userId) {
+        Optional<Post> optionalPost = postDao.findById(postId);
+        Optional<User> optionalUser = userDao.findById(userId);
+        if (optionalUser.isPresent() && optionalPost.isPresent()) {
+            Optional<PostLikes> isLiked = postLikeDao.findByUserIdAndPostId(userId, postId);
+            User user = optionalUser.get();
+            Post post = optionalPost.get();
+            if (!isLiked.isPresent()) {
+                PostLikes postLike = new PostLikes();
+                postLike.setUser(user);
+                postLike.setPost(post);
+                postLikeDao.save(postLike);
+            } else {
+                PostLikes postLike = isLiked.get();
+                postLikeDao.delete(postLike);
+            }
+        }
+    }
+
+    public void addComment(int postId, int userId, String comment1) {
+        Optional<Post> optionalPost = postDao.findById(postId);
+        Optional<User> optionalUser = userDao.findById(userId);
+        if (optionalUser.isPresent() && optionalPost.isPresent()) {
+            User user = optionalUser.get();
+            Post post = optionalPost.get();
+            Comment comment = new Comment();
+            comment.setAuthor(user);
+            comment.setPost(post);
+            comment.setContent(comment1);
+            comment.setCreatedAt(LocalDateTime.now());
+            comment.setUpdatedAt(LocalDateTime.now());
+            commentDao.save(comment);
+        }
+    }
+
+    public void deleteComment(int postId, int commentId, int userId) {
+        Optional<Post> optionalPost = postDao.findById(postId);
+        Optional<User> optionalUser = userDao.findById(userId);
+        Optional<Comment> optionalcomment = commentDao.findById(commentId);
+        if (optionalUser.isPresent() && optionalPost.isPresent() && optionalcomment.isPresent()) {
+            Comment comment = optionalcomment.get();
+            commentDao.delete(comment);
+        }
+    }
+
+    public Comment editComment(int commentId, String comment1) {
+        Optional<Comment> optionalcomment = commentDao.findById(commentId);
+        if (optionalcomment.isPresent()) {
+            Comment comment = optionalcomment.get();
+            comment.setContent(comment1);
+            comment.setUpdatedAt(LocalDateTime.now());
+            return commentDao.save(comment);
+        }
+        return null;
+    }
+    
 }

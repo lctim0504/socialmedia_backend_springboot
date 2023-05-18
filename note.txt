@@ -1,1 +1,9 @@
-psql -U postgres -d socialmedia
+    /*
+     * optionalUser.get() 是用於從 Optional 對象中取得實際的 User
+     * 物件。Optional 是一個容器類型，用於處理可能為空（null）的值。透過 optionalUser.get() 方法，
+     * 我們可以從 Optional 對象中提取實際的非空值，以便在後續程式碼中使用。
+     * 
+     * Optional<User> 對象並不是 User 類型的實例，而是一個包裹了可能為空的 User 物件的容器。
+     * 因此我們需要透過 optionalUser.get() 方法來取得實際的 User 物件，然後再將其設定到 UserFriend 對象中。
+     */
+

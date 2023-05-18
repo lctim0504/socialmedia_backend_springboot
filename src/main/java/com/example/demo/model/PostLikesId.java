@@ -1,22 +1,10 @@
 package com.example.demo.model;
-import jakarta.persistence.*;
 
-@Entity
-@Table(name = "post_shares")
-@IdClass(PostShareId.class)
-public class PostShare {
+import java.io.Serializable;
 
-    @Id
-    @ManyToOne
-    @JoinColumn(name = "post_id")
+public class PostLikesId implements Serializable {
     private Post post;
-
-    @Id
-    @ManyToOne
-    @JoinColumn(name = "user_id")
     private User user;
-
-    // Constructors, getters, setters, and other methods
 
     public Post getPost() {
         return this.post;
@@ -33,6 +21,4 @@ public class PostShare {
     public void setUser(User user) {
         this.user = user;
     }
-
 }
-

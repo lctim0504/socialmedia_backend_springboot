@@ -11,9 +11,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.demo.dto.CommentDto;
 import com.example.demo.dto.PostDto;
+import com.example.demo.model.Comment;
 
 @RestController
 @RequestMapping("/api/posts")
@@ -24,6 +27,40 @@ public class PostController {
     public PostController(PostService postService) {
         this.postService = postService;
     }
+
+    @PostMapping("/{postId}/like")
+    public ResponseEntity<String> likePost(
+            @PathVariable("postId") int postId,
+            @RequestParam("userId") int userId) {
+        postService.likePost(postId, userId);
+        return ResponseEntity.ok("Post liked successfully");
+    }
+    @PostMapping("/{postId}/comments/{commentId}")
+    public ResponseEntity<Comment> editComment(
+            @PathVariable("commentId") int commentId,
+            @RequestBody String comment) {
+        Comment updatedComment = postService.editComment(commentId, comment);
+        return ResponseEntity.ok(updatedComment);
+    }
+
+    @PostMapping("/{postId}/comments")
+    public ResponseEntity<String> addComment(
+            @PathVariable("postId") int postId,
+            @RequestParam("userId") int userId,
+            @RequestBody String comment) {
+        postService.addComment(postId, userId, comment);
+        return ResponseEntity.ok("Comment added successfully");
+    }
+
+    @DeleteMapping("/{postId}/comments/{commentId}")
+    public ResponseEntity<String> deleteComment(
+            @PathVariable("postId") int postId,
+            @PathVariable("commentId") int commentId,
+            @RequestParam("userId") int userId) {
+        postService.deleteComment(postId, commentId, userId);
+        return ResponseEntity.ok("Comment deleted successfully");
+    }
+
 
     @GetMapping("/{postId}")
     public ResponseEntity<PostDto> getPostById(@PathVariable int postId) {
@@ -48,7 +85,9 @@ public class PostController {
     }
 
     @PutMapping("/{postId}")
-    public ResponseEntity<PostDto> updatePost(@PathVariable int postId, @RequestBody PostDto postDto) {
+    public ResponseEntity<PostDto> updatePost(
+            @PathVariable int postId,
+            @RequestBody PostDto postDto) {
         PostDto updatedPost = postService.updatePost(postId, postDto);
         if (updatedPost != null) {
             return ResponseEntity.ok(updatedPost);
@@ -66,4 +105,5 @@ public class PostController {
             return ResponseEntity.notFound().build();
         }
     }
+
 }

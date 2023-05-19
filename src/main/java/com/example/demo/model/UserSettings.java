@@ -2,6 +2,8 @@ package com.example.demo.model;
 
 import java.time.LocalDateTime;
 
+import com.example.demo.enums.Theme;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -15,11 +17,11 @@ public class UserSettings {
     @JoinColumn(name = "user_id")
     private User user;
 
-    private String theme;
+    private Theme theme;
 
     @Column(name = "notifications_enabled")
     private boolean notificationsEnabled;
-    
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
@@ -43,12 +45,28 @@ public class UserSettings {
         this.user = user;
     }
 
-    public String getTheme() {
+    public Theme getTheme() {
         return this.theme;
     }
 
-    public void setTheme(String theme) {
+    public void setTheme(Theme theme) {
         this.theme = theme;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return this.createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return this.updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
     public boolean isNotificationsEnabled() {

@@ -1,7 +1,5 @@
 package com.example.demo.post;
 
-import com.example.demo.CustomException;
-import com.example.demo.dto.CommentDto;
 import com.example.demo.dto.PostDto;
 import com.example.demo.model.Comment;
 import com.example.demo.model.Post;
@@ -11,17 +9,15 @@ import com.example.demo.post.dao.CommentDao;
 import com.example.demo.post.dao.PostDao;
 import com.example.demo.post.dao.PostLikeDao;
 import com.example.demo.post.dao.PostShareDao;
-import com.example.demo.user.dao.UserDao;
+import com.example.demo.user.UserDao;
 
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import javax.naming.NameNotFoundException;
 
 @Service
 public class PostService {

@@ -1,4 +1,4 @@
-package com.example.demo.user.dao;
+package com.example.demo.user.follow;
 
 import java.util.List;
 import java.util.Optional;

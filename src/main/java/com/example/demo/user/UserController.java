@@ -1,7 +1,6 @@
 package com.example.demo.user;
 
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,13 +24,13 @@ public class UserController {
     public UserController(UserService userService) {
         this.userService = userService;
     }
-    /*                                    用戶相關 --------------------------------------- */
     // 取得全部用戶資料
     @GetMapping
     public ResponseEntity<List<UserDto>> getAllUsers() {
         List<UserDto> users = userService.getAllUsers();
         return ResponseEntity.ok(users);
     }
+
     // 取得用戶資料
     @GetMapping("/{id}")
     public ResponseEntity<UserDto> getUserById(@PathVariable("id") int id) {
@@ -42,12 +41,14 @@ public class UserController {
             return ResponseEntity.notFound().build();
         }
     }
+
     // 新增用戶資料
     @PostMapping
     public ResponseEntity<UserDto> createUser(@RequestBody UserDto userDto) {
         UserDto createdUser = userService.createUser(userDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
     }
+
     // 更新用戶資料
     @PutMapping("/{id}")
     public ResponseEntity<UserDto> updateUser(@PathVariable("id") int id, @RequestBody UserDto userDto) {
@@ -58,6 +59,7 @@ public class UserController {
             return ResponseEntity.notFound().build();
         }
     }
+
     // 刪除用戶資料
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable("id") int id) {
@@ -67,56 +69,5 @@ public class UserController {
         } else {
             return ResponseEntity.notFound().build();
         }
-    }
-    /*                                    好友相關 --------------------------------------- */
-    // 取得使用者的好友清單
-    @GetMapping("/{userId}/friends")
-    public ResponseEntity<List<UserDto>> getFriends(@PathVariable("userId") int userId) {
-        List<UserDto> friends = userService.getFriends(userId);
-        return ResponseEntity.ok(friends);
-    }
-    // 加入好友
-    @PostMapping("/{userId}/friends")
-    public ResponseEntity<String> addFriend(@PathVariable("userId") int userId,
-            @RequestBody Map<String, Integer> request) {
-        int friendId = request.get("friendId");
-        userService.addFriend(userId, friendId);
-        return ResponseEntity.ok("Friend added successfully");
-    }
-    // 移除好友
-    @DeleteMapping("/{userId}/friends/{friendId}")
-    public ResponseEntity<String> removeFriend(@PathVariable("userId") int userId,
-            @PathVariable("friendId") int friendId) {
-        userService.removeFriend(userId, friendId);
-        return ResponseEntity.ok("Friend removed successfully");
-    }
-    /*                                    追蹤相關 --------------------------------------- */
-    // 取得使用者的追蹤者清單
-    @GetMapping("/{userId}/followers")
-    public ResponseEntity<List<UserDto>> getFollowers(@PathVariable("userId") int userId) {
-        List<UserDto> followers = userService.getFollowers(userId);
-        return ResponseEntity.ok(followers);
-    }
-    // 取得使用者正在追蹤的人清單
-    @GetMapping("/{userId}/following")
-    public ResponseEntity<List<UserDto>> getFollowing(@PathVariable("userId") int userId) {
-        List<UserDto> following = userService.getFollowing(userId);
-        return ResponseEntity.ok(following);
-    }
-    // 追蹤使用者
-    @PostMapping("/{userId}/follow")
-    public ResponseEntity<String> followUser(@PathVariable("userId") int userId,
-            @RequestBody Map<String, Integer> request) {
-        int followUserId = request.get("followUserId");
-        userService.followUser(userId, followUserId);
-        return ResponseEntity.ok("User followed successfully");
-    }
-    // 取消追蹤使用者
-    @PostMapping("/{userId}/unfollow")
-    public ResponseEntity<String> unfollowUser(@PathVariable("userId") int userId,
-            @RequestBody Map<String, Integer> request) {
-        int unfollowUserId = request.get("unfollowUserId");
-        userService.unfollowUser(userId, unfollowUserId);
-        return ResponseEntity.ok("User unfollowed successfully");
     }
 }

@@ -2,12 +2,23 @@ package com.example.demo.dto;
 
 import java.time.LocalDateTime;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
 public class CommentDto {
-    private int id;
+    @NotNull
+    private Integer id;
+
+    @NotBlank(message = "Content is required")
     private String content;
+
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
+    @NotNull
     private UserDto author;
+
+    @NotNull
     private PostDto post;
 
     // getters 和 setters

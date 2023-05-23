@@ -1,10 +1,17 @@
 package com.example.demo.dto;
 
+import jakarta.validation.constraints.NotNull;
+
 public class FriendDto {
 
-    private int id;
-    private int userId;
-    private int friendId;
+    @NotNull
+    private Integer id;
+
+    @NotNull
+    private Integer userId;
+
+    @NotNull
+    private Integer friendId;
 
     /* ---------------- Getter and setter ----------------- */
 

@@ -2,9 +2,16 @@ package com.example.demo.dto;
 
 import java.util.List;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
 public class TagDto {
-    private int id;
+    @NotNull
+    private Integer id;
+
+    @NotBlank(message = "Name is required")
     private String name;
+
     private List<PostDto> posts;
 
     // getters 和 setters

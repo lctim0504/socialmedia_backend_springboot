@@ -5,10 +5,14 @@ import com.example.demo.components.post.dao.PostDao;
 import com.example.demo.components.post.dao.PostLikeDao;
 import com.example.demo.components.post.dao.PostShareDao;
 import com.example.demo.components.user.UserDao;
+import com.example.demo.dto.CommentDto;
 import com.example.demo.dto.PostDto;
+import com.example.demo.dto.TagDto;
+import com.example.demo.dto.UserDto;
 import com.example.demo.model.Comment;
 import com.example.demo.model.Post;
 import com.example.demo.model.PostLikes;
+import com.example.demo.model.Tag;
 import com.example.demo.model.User;
 
 import org.springframework.stereotype.Service;
@@ -84,9 +88,38 @@ public class PostService {
         postDto.setCreatedAt(post.getCreatedAt());
         postDto.setUpdatedAt(post.getUpdatedAt());
         postDto.setAuthorId(post.getAuthorId());
+        postDto.setAuthor(mapUserToDto(post.getAuthor()));
+        postDto.setComment(mapCommentToDto(post.getComment()));
+        postDto.setLikes(mapUsersToDto(post.getLikes()));
+        postDto.setShares(mapUsersToDto(post.getShares()));
+        postDto.setTags(mapTagsToDto(post.getTags()));
         return postDto;
     }
-
+    private TagDto mapTagToDto(Tag tag) {
+        TagDto tagDto = new TagDto();
+        tagDto.setId(tag.getId());
+        tagDto.setName(tag.getName());
+        return tagDto;
+    }
+    private List<TagDto> mapTagsToDto(List<Tag> tags) {
+        return tags.stream().map(this::mapTagToDto).collect(Collectors.toList());
+    }
+    private CommentDto mapCommentToDto(Comment comment) {
+        CommentDto commentDto = new CommentDto();
+        commentDto.setId(comment.getId());
+        commentDto.setAuthor(mapUserToDto(comment.getAuthor()));
+        commentDto.setContent(comment.getContent());
+        return commentDto;
+    }
+    private UserDto mapUserToDto(User user) {
+        UserDto userDto = new UserDto();
+        userDto.setId(user.getId());
+        userDto.setUsername(user.getUsername());
+        return userDto;
+    }
+    private List<UserDto> mapUsersToDto(List<User> users) {
+        return users.stream().map(this::mapUserToDto).collect(Collectors.toList());
+    }
     private List<PostDto> mapPostsToDto(List<Post> posts) {
         return posts.stream().map(this::mapPostToDto).collect(Collectors.toList());
     }

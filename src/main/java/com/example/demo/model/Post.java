@@ -23,8 +23,13 @@ public class Post {
     @Column(name = "author_id")
     private int authorId;
 
-    @OneToMany(mappedBy = "post")
-    private List<Comment> comments;
+    @ManyToOne
+    @JoinColumn(name = "author_id", referencedColumnName = "id", insertable = false, updatable = false)
+    private User author;
+
+    @OneToOne(mappedBy = "post")
+    @OrderBy("createdAt DESC")
+    private Comment Comment;
 
     @ManyToMany
     @JoinTable(name = "post_likes", joinColumns = @JoinColumn(name = "post_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
@@ -42,6 +47,14 @@ public class Post {
 
     public int getId() {
         return this.id;
+    }
+
+    public User getAuthor() {
+        return this.author;
+    }
+
+    public void setAuthor(User author) {
+        this.author = author;
     }
 
     public int getAuthorId() {
@@ -80,15 +93,12 @@ public class Post {
         this.updatedAt = updatedAt;
     }
 
-
-
-
-    public List<Comment> getComments() {
-        return this.comments;
+    public Comment getComment() {
+        return this.Comment;
     }
 
-    public void setComments(List<Comment> comments) {
-        this.comments = comments;
+    public void setComment(Comment Comment) {
+        this.Comment = Comment;
     }
 
     public List<User> getLikes() {

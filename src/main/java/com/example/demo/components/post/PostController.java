@@ -35,6 +35,7 @@ public class PostController {
         postService.likePost(postId, userId);
         return ResponseEntity.ok("Post liked successfully");
     }
+
     @PostMapping("/{postId}/comments/{commentId}")
     public ResponseEntity<Comment> editComment(
             @PathVariable("commentId") int commentId,
@@ -60,7 +61,6 @@ public class PostController {
         postService.deleteComment(postId, commentId, userId);
         return ResponseEntity.ok("Comment deleted successfully");
     }
-
 
     @GetMapping("/{postId}")
     public ResponseEntity<PostDto> getPostById(@PathVariable int postId) {

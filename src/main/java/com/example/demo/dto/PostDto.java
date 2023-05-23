@@ -3,18 +3,39 @@ package com.example.demo.dto;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
 public class PostDto {
-    private int id;
-    private int authorId;
+    @NotNull
+    private Integer id;
+
+    @NotNull
+    private Integer authorId;
+
+    private UserDto author;
+
+    @NotBlank(message = "Content is required")
     private String content;
+
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private List<CommentDto> comments;
+
+    private Integer commentQty; //評論數
+    private CommentDto comment; //取讚數最多的comment顯示
     private List<UserDto> likes;
     private List<UserDto> shares;
     private List<TagDto> tags;
 
     // getters 和 setters
+
+    public UserDto getAuthor() {
+        return this.author;
+    }
+
+    public void setAuthor(UserDto author) {
+        this.author = author;
+    }
 
     public int getId() {
         return this.id;
@@ -48,7 +69,6 @@ public class PostDto {
         this.updatedAt = updatedAt;
     }
 
-
     public int getAuthorId() {
         return this.authorId;
     }
@@ -57,13 +77,22 @@ public class PostDto {
         this.authorId = authorId;
     }
 
-    public List<CommentDto> getComments() {
-        return this.comments;
+    public Integer getCommentQty() {
+        return this.commentQty;
     }
 
-    public void setComments(List<CommentDto> comments) {
-        this.comments = comments;
+    public void setCommentQty(Integer commentQty) {
+        this.commentQty = commentQty;
     }
+
+    public CommentDto getComment() {
+        return this.comment;
+    }
+
+    public void setComment(CommentDto comment) {
+        this.comment = comment;
+    }
+
 
     public List<UserDto> getLikes() {
         return this.likes;

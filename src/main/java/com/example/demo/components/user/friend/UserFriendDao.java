@@ -5,12 +5,10 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.stereotype.Repository;
 
 import com.example.demo.enums.FriendStatus;
 import com.example.demo.model.UserFriend;
 
-@Repository
 public interface UserFriendDao extends JpaRepository<UserFriend, Integer> {
 
     //List<UserFriend> findByUserIdOrFriendId(Integer userId, Integer friendId);

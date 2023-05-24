@@ -19,6 +19,7 @@ public class UserSearchController {
         this.userSearchService = userSearchService;
     }
 
+    //搜尋使用者
     @GetMapping("/search")
     public List<User> searchUsers(@RequestParam("query") String query) {
         return userSearchService.searchUsers(query);

@@ -13,8 +13,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.example.demo.dto.CommentDto;
 import com.example.demo.dto.PostDto;
 import com.example.demo.model.Comment;
 
@@ -28,6 +26,7 @@ public class PostController {
         this.postService = postService;
     }
 
+    // 對文章按讚
     @PostMapping("/{postId}/like")
     public ResponseEntity<String> likePost(
             @PathVariable("postId") int postId,
@@ -36,6 +35,7 @@ public class PostController {
         return ResponseEntity.ok("Post liked successfully");
     }
 
+    // 編輯評論
     @PostMapping("/{postId}/comments/{commentId}")
     public ResponseEntity<Comment> editComment(
             @PathVariable("commentId") int commentId,
@@ -44,6 +44,7 @@ public class PostController {
         return ResponseEntity.ok(updatedComment);
     }
 
+    // 新增評論
     @PostMapping("/{postId}/comments")
     public ResponseEntity<String> addComment(
             @PathVariable("postId") int postId,
@@ -53,6 +54,7 @@ public class PostController {
         return ResponseEntity.ok("Comment added successfully");
     }
 
+    // 刪除評論
     @DeleteMapping("/{postId}/comments/{commentId}")
     public ResponseEntity<String> deleteComment(
             @PathVariable("postId") int postId,
@@ -62,6 +64,7 @@ public class PostController {
         return ResponseEntity.ok("Comment deleted successfully");
     }
 
+    // 取得文章資料
     @GetMapping("/{postId}")
     public ResponseEntity<PostDto> getPostById(@PathVariable int postId) {
         PostDto postDto = postService.getPostById(postId);
@@ -72,38 +75,33 @@ public class PostController {
         }
     }
 
+    // 取得全部文章
     @GetMapping
     public ResponseEntity<List<PostDto>> getAllPosts() {
         List<PostDto> posts = postService.getAllPosts();
         return ResponseEntity.ok(posts);
     }
 
+    // 新增文章資料
     @PostMapping
     public ResponseEntity<PostDto> createPost(@RequestBody PostDto postDto) {
         PostDto createdPost = postService.createPost(postDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdPost);
     }
 
+    // 更新文章資料
     @PutMapping("/{postId}")
     public ResponseEntity<PostDto> updatePost(
             @PathVariable int postId,
             @RequestBody PostDto postDto) {
         PostDto updatedPost = postService.updatePost(postId, postDto);
-        if (updatedPost != null) {
-            return ResponseEntity.ok(updatedPost);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        return ResponseEntity.ok(updatedPost);
     }
 
+    // 刪除文章資料
     @DeleteMapping("/{postId}")
     public ResponseEntity<Void> deletePost(@PathVariable int postId) {
-        boolean deleted = postService.deletePost(postId);
-        if (deleted) {
-            return ResponseEntity.noContent().build();
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        postService.deletePost(postId);
+        return ResponseEntity.noContent().build();
     }
-
 }

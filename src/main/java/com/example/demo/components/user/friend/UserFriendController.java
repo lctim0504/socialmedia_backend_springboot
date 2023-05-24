@@ -23,9 +23,11 @@ public class UserFriendController {
     public UserFriendController(UserFriendService userService) {
         this.userService = userService;
     }
+
     // 取得使用者的好友清單
     @GetMapping("/friends")
     public ResponseEntity<List<UserDto>> getFriends(@PathVariable("userId") int userId) {
+
         List<UserDto> friends = userService.getFriends(userId);
         return ResponseEntity.ok(friends);
     }
@@ -34,6 +36,7 @@ public class UserFriendController {
     @PostMapping("/friends")
     public ResponseEntity<String> addFriend(@PathVariable("userId") int userId,
             @RequestBody Map<String, Integer> request) {
+
         int friendId = request.get("friendId");
         userService.addFriend(userId, friendId);
         return ResponseEntity.ok("Friend added successfully");
@@ -43,6 +46,7 @@ public class UserFriendController {
     @DeleteMapping("/friends/{friendId}")
     public ResponseEntity<String> removeFriend(@PathVariable("userId") int userId,
             @PathVariable("friendId") int friendId) {
+
         userService.removeFriend(userId, friendId);
         return ResponseEntity.ok("Friend removed successfully");
     }

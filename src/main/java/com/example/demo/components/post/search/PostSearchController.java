@@ -18,7 +18,7 @@ public class PostSearchController {
     public PostSearchController(PostSearchService postSearchService) {
         this.postSearchService = postSearchService;
     }
-
+    // 搜尋文章
     @GetMapping("/search")
     public List<Post> searchPosts(@RequestParam("query") String query) {
         return postSearchService.searchPosts(query);

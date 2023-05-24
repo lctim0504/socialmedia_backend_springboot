@@ -1,6 +1,8 @@
 package com.example.demo.components.user.follow;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.example.demo.components.user.UserDao;
 import com.example.demo.dto.UserDto;
@@ -17,7 +19,8 @@ public class UserFollowerService {
     private final UserDao userDao;
     private final UserFollowerDao userFollowerDao;
 
-    public UserFollowerService(UserDao userDao,
+    public UserFollowerService(
+            UserDao userDao,
             UserFollowerDao userFollowerDao) {
         this.userDao = userDao;
         this.userFollowerDao = userFollowerDao;
@@ -57,33 +60,17 @@ public class UserFollowerService {
             userFollower.setUser(user);
             userFollower.setFollower(followUser);
             userFollowerDao.save(userFollower);
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User or Follower not found");
         }
     }
 
     public void unfollowUser(int userId, int unfollowUserId) {
-        Optional<UserFollower> optionalUserFollower = userFollowerDao.findByUserIdAndFollowerId(userId,
-                unfollowUserId);
-        optionalUserFollower.ifPresent(userFollowerDao::delete);
-    }
-
-    /* Map映射 --------------------------------------- */
-    private UserDto mapUserToDto(User user) {
-        UserDto userDto = new UserDto();
-        userDto.setId(user.getId());
-        userDto.setUsername(user.getUsername());
-        userDto.setEmail(user.getEmail());
-        return userDto;
-    }
-
-    private List<UserDto> mapUsersToDto(List<User> users) {
-        return users.stream().map(this::mapUserToDto).collect(Collectors.toList());
-    }
-
-    private User mapDtoToUser(UserDto userDto) {
-        User user = new User();
-        user.setUsername(userDto.getUsername());
-        user.setEmail(userDto.getEmail());
-        user.setPassword(userDto.getPassword());
-        return user;
+        Optional<UserFollower> optionalUserFollower = userFollowerDao.findByUserIdAndFollowerId(userId, unfollowUserId);
+        if (optionalUserFollower.isPresent()) {
+            userFollowerDao.delete(optionalUserFollower.get());
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "UserFollower not found");
+        }
     }
 }

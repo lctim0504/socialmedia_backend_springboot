@@ -1,6 +1,8 @@
 package com.example.demo.components.user.friend;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.example.demo.components.user.UserDao;
 import com.example.demo.dto.UserDto;
@@ -49,32 +51,17 @@ public class UserFriendService {
             userFriend.setFriend(friend);
             userFriend.setStatus(FriendStatus.PENDING);
             userFriendDao.save(userFriend);
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User or Friend not found");
         }
     }
 
     public void removeFriend(int userId, int friendId) {
         Optional<UserFriend> optionalUserFriend = userFriendDao.findByUserIdAndFriendId(userId, friendId);
-        optionalUserFriend.ifPresent(userFriendDao::delete);
-    }
-
-    /* Map映射 --------------------------------------- */
-    private UserDto mapUserToDto(User user) {
-        UserDto userDto = new UserDto();
-        userDto.setId(user.getId());
-        userDto.setUsername(user.getUsername());
-        userDto.setEmail(user.getEmail());
-        return userDto;
-    }
-
-    private List<UserDto> mapUsersToDto(List<User> users) {
-        return users.stream().map(this::mapUserToDto).collect(Collectors.toList());
-    }
-
-    private User mapDtoToUser(UserDto userDto) {
-        User user = new User();
-        user.setUsername(userDto.getUsername());
-        user.setEmail(userDto.getEmail());
-        user.setPassword(userDto.getPassword());
-        return user;
+        if (optionalUserFriend.isPresent()) {
+            userFriendDao.delete(optionalUserFriend.get());
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "UserFriend not found");
+        }
     }
 }

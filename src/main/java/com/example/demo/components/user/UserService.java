@@ -1,74 +1,67 @@
 package com.example.demo.components.user;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
+import com.example.demo.Mapping;
 import com.example.demo.dto.UserDto;
 import com.example.demo.model.User;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class UserService {
 
     private final UserDao userRepository;
+    private final Mapping mapping;
 
-    public UserService(UserDao userRepository) {
+    public UserService(
+            Mapping mapping,
+            UserDao userRepository) {
+        this.mapping = mapping;
         this.userRepository = userRepository;
     }
 
     public List<UserDto> getAllUsers() {
         List<User> users = userRepository.findAll();
-        return mapUsersToDto(users);
+        return mapping.UsersToDto(users);
     }
 
-    public UserDto getUserById(int id) {
-        Optional<User> optionalUser = userRepository.findById(id);
-        return optionalUser.map(this::mapUserToDto).orElse(null);
+    public UserDto getUserById(int userId) {
+        Optional<User> optionalUser = userRepository.findById(userId);
+        if (optionalUser.isPresent()) {
+            return mapping.UserToDto(optionalUser.get());
+        }
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found with ID: " + userId);
     }
 
     public UserDto createUser(UserDto userDto) {
-        User user = mapDtoToUser(userDto);
+        User user = mapping.DtoToUser(userDto);
         User createdUser = userRepository.save(user);
-        return mapUserToDto(createdUser);
+        return mapping.UserToDto(createdUser);
     }
 
-    public UserDto updateUser(int id, UserDto userDto) {
-        Optional<User> optionalUser = userRepository.findById(id);
-        optionalUser.ifPresent(user -> {
+    public UserDto updateUser(int userId, UserDto userDto) {
+        Optional<User> optionalUser = userRepository.findById(userId);
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
             user.setUsername(userDto.getUsername());
             user.setEmail(userDto.getEmail());
             user.setPassword(userDto.getPassword());
             userRepository.save(user);
-        });
-        return optionalUser.map(this::mapUserToDto).orElse(null);
+            return mapping.UserToDto(user);
+        }
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found with ID: " + userId);
     }
 
-    public boolean deleteUser(int id) {
-        Optional<User> optionalUser = userRepository.findById(id);
-        optionalUser.ifPresent(user -> userRepository.delete(user));
-        return optionalUser.isPresent();
-    }
-
-    /* Map映射 --------------------------------------- */
-    private UserDto mapUserToDto(User user) {
-        UserDto userDto = new UserDto();
-        userDto.setId(user.getId());
-        userDto.setUsername(user.getUsername());
-        userDto.setEmail(user.getEmail());
-        return userDto;
-    }
-
-    private List<UserDto> mapUsersToDto(List<User> users) {
-        return users.stream().map(this::mapUserToDto).collect(Collectors.toList());
-    }
-
-    private User mapDtoToUser(UserDto userDto) {
-        User user = new User();
-        user.setUsername(userDto.getUsername());
-        user.setEmail(userDto.getEmail());
-        user.setPassword(userDto.getPassword());
-        return user;
+    public void deleteUser(int userId) {
+        Optional<User> optionalUser = userRepository.findById(userId);
+        if (optionalUser.isPresent()) {
+            userRepository.delete(optionalUser.get());
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found with ID: " + userId);
+        }
     }
 }

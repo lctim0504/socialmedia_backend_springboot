@@ -1,136 +1,90 @@
 package com.example.demo.components.post;
 
+import com.example.demo.Mapping;
 import com.example.demo.components.post.dao.CommentDao;
 import com.example.demo.components.post.dao.PostDao;
 import com.example.demo.components.post.dao.PostLikeDao;
-import com.example.demo.components.post.dao.PostShareDao;
 import com.example.demo.components.user.UserDao;
-import com.example.demo.dto.CommentDto;
 import com.example.demo.dto.PostDto;
-import com.example.demo.dto.TagDto;
-import com.example.demo.dto.UserDto;
 import com.example.demo.model.Comment;
 import com.example.demo.model.Post;
 import com.example.demo.model.PostLikes;
-import com.example.demo.model.Tag;
 import com.example.demo.model.User;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-
 
 @Service
 public class PostService {
 
     private final PostDao postDao;
     private final PostLikeDao postLikeDao;
-    private final PostShareDao postShareDao;
     private final UserDao userDao;
     private final CommentDao commentDao;
+    private final Mapping mapping;
 
     public PostService(
             PostDao postDao,
             PostLikeDao postLikeDao,
-            PostShareDao postShareDao,
             UserDao userDao,
+            Mapping mapping,
             CommentDao commentDao) {
         this.postDao = postDao;
         this.postLikeDao = postLikeDao;
-        this.postShareDao = postShareDao;
         this.userDao = userDao;
         this.commentDao = commentDao;
+        this.mapping = mapping;
     }
 
     public PostDto getPostById(int postId) {
         Optional<Post> optionalPost = postDao.findById(postId);
-        return optionalPost.map(this::mapPostToDto).orElse(null);
+        if (optionalPost.isPresent()) {
+            return mapping.PostToDto(optionalPost.get());
+        } else
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Post not found with ID: " + postId);
     }
 
+    // 取得全部文章資料
     public List<PostDto> getAllPosts() {
         List<Post> posts = postDao.findAll();
-        return mapPostsToDto(posts);
+        return mapping.PostsToDto(posts);
     }
 
+    // 新增文章資料
     public PostDto createPost(PostDto postDto) {
-        Post post = mapDtoToPost(postDto);
+        Post post = mapping.DtoToPost(postDto);
         Post createdPost = postDao.save(post);
-        return mapPostToDto(createdPost);
+        return mapping.PostToDto(createdPost);
     }
 
+    // 更新文章資料
     public PostDto updatePost(int postId, PostDto postDto) {
         Optional<Post> optionalPost = postDao.findById(postId);
         if (optionalPost.isPresent()) {
             Post post = optionalPost.get();
             post.setContent(postDto.getContent());
             Post updatedPost = postDao.save(post);
-            return mapPostToDto(updatedPost);
+            return mapping.PostToDto(updatedPost);
         }
-        return null;
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Post not found with ID: " + postId);
     }
 
-    public boolean deletePost(int postId) {
+    // 刪除文章資料
+    public void deletePost(int postId) {
         Optional<Post> optionalPost = postDao.findById(postId);
         if (optionalPost.isPresent()) {
             postDao.delete(optionalPost.get());
-            return true;
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Post not found with ID: " + postId);
         }
-        return false;
     }
 
-    private PostDto mapPostToDto(Post post) {
-        PostDto postDto = new PostDto();
-        postDto.setId(post.getId());
-        postDto.setContent(post.getContent());
-        postDto.setCreatedAt(post.getCreatedAt());
-        postDto.setUpdatedAt(post.getUpdatedAt());
-        postDto.setAuthorId(post.getAuthorId());
-        postDto.setAuthor(mapUserToDto(post.getAuthor()));
-        postDto.setComment(mapCommentToDto(post.getComment()));
-        postDto.setLikes(mapUsersToDto(post.getLikes()));
-        postDto.setShares(mapUsersToDto(post.getShares()));
-        postDto.setTags(mapTagsToDto(post.getTags()));
-        return postDto;
-    }
-    private TagDto mapTagToDto(Tag tag) {
-        TagDto tagDto = new TagDto();
-        tagDto.setId(tag.getId());
-        tagDto.setName(tag.getName());
-        return tagDto;
-    }
-    private List<TagDto> mapTagsToDto(List<Tag> tags) {
-        return tags.stream().map(this::mapTagToDto).collect(Collectors.toList());
-    }
-    private CommentDto mapCommentToDto(Comment comment) {
-        CommentDto commentDto = new CommentDto();
-        commentDto.setId(comment.getId());
-        commentDto.setAuthor(mapUserToDto(comment.getAuthor()));
-        commentDto.setContent(comment.getContent());
-        return commentDto;
-    }
-    private UserDto mapUserToDto(User user) {
-        UserDto userDto = new UserDto();
-        userDto.setId(user.getId());
-        userDto.setUsername(user.getUsername());
-        return userDto;
-    }
-    private List<UserDto> mapUsersToDto(List<User> users) {
-        return users.stream().map(this::mapUserToDto).collect(Collectors.toList());
-    }
-    private List<PostDto> mapPostsToDto(List<Post> posts) {
-        return posts.stream().map(this::mapPostToDto).collect(Collectors.toList());
-    }
-
-    private Post mapDtoToPost(PostDto postDto) {
-        Post post = new Post();
-        post.setContent(postDto.getContent());
-        post.setAuthorId(postDto.getAuthorId());
-        return post;
-    }
-
+    // 對文章按讚
     public void likePost(int postId, int userId) {
         Optional<Post> optionalPost = postDao.findById(postId);
         Optional<User> optionalUser = userDao.findById(userId);
@@ -147,9 +101,12 @@ public class PostService {
                 PostLikes postLike = isLiked.get();
                 postLikeDao.delete(postLike);
             }
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Post or User not found");
         }
     }
 
+    // 新增評論
     public void addComment(int postId, int userId, String comment1) {
         Optional<Post> optionalPost = postDao.findById(postId);
         Optional<User> optionalUser = userDao.findById(userId);
@@ -163,9 +120,12 @@ public class PostService {
             comment.setCreatedAt(LocalDateTime.now());
             comment.setUpdatedAt(LocalDateTime.now());
             commentDao.save(comment);
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Post or User not found");
         }
     }
 
+    // 刪除評論
     public void deleteComment(int postId, int commentId, int userId) {
         Optional<Post> optionalPost = postDao.findById(postId);
         Optional<User> optionalUser = userDao.findById(userId);
@@ -173,9 +133,12 @@ public class PostService {
         if (optionalUser.isPresent() && optionalPost.isPresent() && optionalcomment.isPresent()) {
             Comment comment = optionalcomment.get();
             commentDao.delete(comment);
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Post, User, or Comment not found");
         }
     }
 
+    // 編輯評論
     public Comment editComment(int commentId, String comment1) {
         Optional<Comment> optionalcomment = commentDao.findById(commentId);
         if (optionalcomment.isPresent()) {
@@ -184,7 +147,6 @@ public class PostService {
             comment.setUpdatedAt(LocalDateTime.now());
             return commentDao.save(comment);
         }
-        return null;
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Comment not found with ID: " + commentId);
     }
-    
 }

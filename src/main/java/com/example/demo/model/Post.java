@@ -3,6 +3,8 @@ package com.example.demo.model;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.hibernate.annotations.Formula;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -27,9 +29,12 @@ public class Post {
     @JoinColumn(name = "author_id", referencedColumnName = "id", insertable = false, updatable = false)
     private User author;
 
+    @Formula("(SELECT COUNT(*) FROM comments c1_0 WHERE c1_0.post_id = id)")
+    private Integer commentQty;
+
     @OneToOne(mappedBy = "post")
     @OrderBy("createdAt DESC")
-    private Comment Comment;
+    private Comment comment;
 
     @ManyToMany
     @JoinTable(name = "post_likes", joinColumns = @JoinColumn(name = "post_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
@@ -93,12 +98,21 @@ public class Post {
         this.updatedAt = updatedAt;
     }
 
-    public Comment getComment() {
-        return this.Comment;
+
+    public Integer getCommentQty() {
+        return this.commentQty;
     }
 
-    public void setComment(Comment Comment) {
-        this.Comment = Comment;
+    public void setCommentQty(Integer commentQty) {
+        this.commentQty = commentQty;
+    }
+
+    public Comment getComment() {
+        return this.comment;
+    }
+
+    public void setComment(Comment comment) {
+        this.comment = comment;
     }
 
     public List<User> getLikes() {

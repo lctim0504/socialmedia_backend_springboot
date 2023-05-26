@@ -5,6 +5,7 @@ import com.example.demo.components.post.dao.CommentDao;
 import com.example.demo.components.post.dao.PostDao;
 import com.example.demo.components.post.dao.PostLikeDao;
 import com.example.demo.components.user.UserDao;
+import com.example.demo.dto.CommentDto;
 import com.example.demo.dto.PostDto;
 import com.example.demo.model.Comment;
 import com.example.demo.model.Post;
@@ -103,6 +104,17 @@ public class PostService {
             }
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Post or User not found");
+        }
+    }
+
+    // 取得文章全部評論
+    public List<CommentDto> getCommentsByPostId(int postId) {
+        Optional<Post> optionalPost = postDao.findById(postId);
+        if (optionalPost.isPresent()) {
+            List<Comment> comments = commentDao.findByPostId(postId);
+            return mapping.CommentsToDto(comments);
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Post not found");
         }
     }
 

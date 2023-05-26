@@ -21,8 +21,10 @@ public class PostDto {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    private Integer commentQty; //評論數
-    private CommentDto comment; //取讚數最多的comment顯示
+    private Integer commentQty; // 評論數
+    private CommentDto comment; // 取讚數最多的comment顯示
+    private List<CommentDto> comments; // 取讚數最多的comment顯示
+
     private List<UserDto> likes;
     private List<UserDto> shares;
     private List<TagDto> tags;
@@ -77,6 +79,14 @@ public class PostDto {
         this.authorId = authorId;
     }
 
+    public List<CommentDto> getComments() {
+        return this.comments;
+    }
+
+    public void setComments(List<CommentDto> comments) {
+        this.comments = comments;
+    }
+
     public Integer getCommentQty() {
         return this.commentQty;
     }
@@ -92,7 +102,6 @@ public class PostDto {
     public void setComment(CommentDto comment) {
         this.comment = comment;
     }
-
 
     public List<UserDto> getLikes() {
         return this.likes;

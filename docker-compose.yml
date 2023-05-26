@@ -1,0 +1,20 @@
+version: '3'
+services:
+  app2:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 192.168.0.39:3000:8080
+    depends_on:
+      - db
+  db:
+    image: postgres:13
+    restart: always
+    environment:
+      DATABASE_URL: host.docker.internal:5435
+      POSTGRES_DB: socialmedia
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123
+    ports:
+      - 5435:5432

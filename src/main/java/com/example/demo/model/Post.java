@@ -32,9 +32,8 @@ public class Post {
     @Formula("(SELECT COUNT(*) FROM comments c1_0 WHERE c1_0.post_id = id)")
     private Integer commentQty;
 
-    @OneToOne(mappedBy = "post")
-    @OrderBy("createdAt DESC")
-    private Comment comment;
+    @OneToMany(mappedBy = "post")
+    private List<Comment> comments;
 
     @ManyToMany
     @JoinTable(name = "post_likes", joinColumns = @JoinColumn(name = "post_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
@@ -98,7 +97,6 @@ public class Post {
         this.updatedAt = updatedAt;
     }
 
-
     public Integer getCommentQty() {
         return this.commentQty;
     }
@@ -107,12 +105,12 @@ public class Post {
         this.commentQty = commentQty;
     }
 
-    public Comment getComment() {
-        return this.comment;
+    public List<Comment> getComments() {
+        return this.comments;
     }
 
-    public void setComment(Comment comment) {
-        this.comment = comment;
+    public void setComments(List<Comment> comments) {
+        this.comments = comments;
     }
 
     public List<User> getLikes() {

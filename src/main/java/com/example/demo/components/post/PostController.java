@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.example.demo.dto.CommentDto;
 import com.example.demo.dto.PostDto;
 import com.example.demo.model.Comment;
 
@@ -42,6 +44,12 @@ public class PostController {
             @RequestBody String comment) {
         Comment updatedComment = postService.editComment(commentId, comment);
         return ResponseEntity.ok(updatedComment);
+    }
+
+    @GetMapping("/{postId}/comments")
+    public ResponseEntity<List<CommentDto>> getCommentsbyPostId(@PathVariable("postId") int postId) {
+        List<CommentDto> comments = postService.getCommentsByPostId(postId);
+        return ResponseEntity.ok(comments);
     }
 
     // 新增評論

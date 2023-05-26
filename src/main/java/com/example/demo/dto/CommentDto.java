@@ -1,6 +1,7 @@
 package com.example.demo.dto;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -15,13 +16,28 @@ public class CommentDto {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    @NotNull
     private UserDto author;
-
-    @NotNull
     private PostDto post;
+    private List<UserDto> likes;
+    private List<CommentDto> comments;
 
     // getters 和 setters
+
+    public List<CommentDto> getComments() {
+        return this.comments;
+    }
+
+    public void setComments(List<CommentDto> comments) {
+        this.comments = comments;
+    }
+
+    public List<UserDto> getLikes() {
+        return this.likes;
+    }
+
+    public void setLikes(List<UserDto> likes) {
+        this.likes = likes;
+    }
 
     public int getId() {
         return this.id;

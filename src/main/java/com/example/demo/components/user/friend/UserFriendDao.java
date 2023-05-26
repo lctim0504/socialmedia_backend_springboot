@@ -11,13 +11,15 @@ import com.example.demo.model.UserFriend;
 
 public interface UserFriendDao extends JpaRepository<UserFriend, Integer> {
 
-    //List<UserFriend> findByUserIdOrFriendId(Integer userId, Integer friendId);
+    // List<UserFriend> findByUserIdOrFriendId(Integer userId, Integer friendId);
 
-    @Query("SELECT uf FROM UserFriend uf WHERE (uf.user.id = :userId AND uf.friend.id = :friendId) OR (uf.user.id = :friendId AND uf.friend.id = :userId)")
-    Optional<UserFriend> findByUserIdAndFriendId(Integer userId, Integer friendId);
+    // 取得單一方的好友關係
+    @Query("SELECT uf FROM UserFriend uf WHERE uf.user.id = :userId AND uf.status = :status")
+    List<UserFriend> findByUserIdAndStatus(Integer userId, FriendStatus status);
 
-    @Query("SELECT uf FROM UserFriend uf WHERE (uf.user.id = :userId OR uf.friend.id = :userId) AND uf.status = :status")
-    List<UserFriend> findByUserIdOrFriendIdAndStatus(Integer userId, FriendStatus status);
+    // 取得雙方好友關係
+    @Query("SELECT uf FROM UserFriend uf WHERE uf.user.id = :userId AND uf.friend.id = :friendId")
+    Optional<UserFriend> getCurrentStatus(Integer userId, Integer friendId);
 
     List<UserFriend> findByUserId(Integer userId);
 }

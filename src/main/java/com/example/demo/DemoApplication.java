@@ -18,14 +18,14 @@ public class DemoApplication {
 		SpringApplication.run(DemoApplication.class, args);
 	}
 
-	@Bean
-	public WebServerFactoryCustomizer<ConfigurableServletWebServerFactory> webServerFactoryCustomizer()
-			throws UnknownHostException {
-		InetAddress address = InetAddress.getByName("192.168.0.39");
+	// @Bean
+	// public WebServerFactoryCustomizer<ConfigurableServletWebServerFactory> webServerFactoryCustomizer()
+	// 		throws UnknownHostException {
+	// 	InetAddress address = InetAddress.getByName("192.168.0.39");
 
-		return (WebServerFactoryCustomizer<ConfigurableServletWebServerFactory>) factory -> {
-			factory.setAddress(address);
-			factory.setPort(3000);
-		};
-	}
+	// 	return (WebServerFactoryCustomizer<ConfigurableServletWebServerFactory>) factory -> {
+	// 		factory.setAddress(address);
+	// 		factory.setPort(3000);
+	// 	};
+	// }
 }

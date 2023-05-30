@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 import com.example.demo.dto.CommentDto;
+import com.example.demo.dto.ReplyDto;
 
 @RestController
 @RequestMapping("/api/comments")
@@ -40,8 +41,8 @@ public class CommentController {
     public ResponseEntity<String> addComment(
             @PathVariable("commentId") int parentId,
             @RequestParam("userId") int userId,
-            @RequestBody String comment) {
-        commentService.addComment(parentId, userId, comment);
+            @RequestBody ReplyDto comment) {
+        commentService.addComment(parentId, userId, comment.getComment());
         return ResponseEntity.ok("Comment added successfully");
     }
 }

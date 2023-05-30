@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.dto.CommentDto;
 import com.example.demo.dto.PostDto;
+import com.example.demo.dto.ReplyDto;
 import com.example.demo.model.Comment;
 
 @RestController
@@ -38,17 +39,22 @@ public class PostController {
     }
 
     // 編輯評論
-    @PostMapping("/{postId}/comments/{commentId}")
-    public ResponseEntity<Comment> editComment(
+    @PutMapping("/{postId}/comments/{commentId}")
+    public ResponseEntity<String> editComment(
             @PathVariable("commentId") int commentId,
-            @RequestBody String comment) {
-        Comment updatedComment = postService.editComment(commentId, comment);
-        return ResponseEntity.ok(updatedComment);
+            @RequestBody ReplyDto comment) {
+        postService.editComment(commentId, comment.getComment());
+        return ResponseEntity.ok("Post updated successfully");
     }
 
     @GetMapping("/{postId}/comments")
-    public ResponseEntity<List<CommentDto>> getCommentsbyPostId(@PathVariable("postId") int postId) {
-        List<CommentDto> comments = postService.getCommentsByPostId(postId);
+    public ResponseEntity<List<CommentDto>> getCommentsbyPostId(
+            @RequestParam(required = false, defaultValue = "10") int limit,
+            @RequestParam(required = false, defaultValue = "0") int offset,
+            @RequestParam(required = false, defaultValue = "likes") String sort,
+            @PathVariable("postId") Integer postId) {
+        List<CommentDto> comments;
+        comments = postService.getCommentsByPostId(postId, sort, limit, offset);
         return ResponseEntity.ok(comments);
     }
 
@@ -57,8 +63,8 @@ public class PostController {
     public ResponseEntity<String> addComment(
             @PathVariable("postId") int postId,
             @RequestParam("userId") int userId,
-            @RequestBody String comment) {
-        postService.addComment(postId, userId, comment);
+            @RequestBody ReplyDto comment) {
+        postService.addComment(postId, userId, comment.getComment());
         return ResponseEntity.ok("Comment added successfully");
     }
 
@@ -83,10 +89,37 @@ public class PostController {
         }
     }
 
+    // 取得作者文章資料
+    // 取得使用者好友文章資料
     // 取得全部文章
     @GetMapping
-    public ResponseEntity<List<PostDto>> getAllPosts() {
-        List<PostDto> posts = postService.getAllPosts();
+    public ResponseEntity<List<PostDto>> getAllPosts(
+            @RequestParam(required = false, defaultValue = "10") int limit,
+            @RequestParam(required = false, defaultValue = "0") int offset,
+            @RequestParam(required = false, defaultValue = "updatedAt") String sort,
+            @RequestParam(required = false) Integer authorId) {
+        List<PostDto> posts;
+        if (authorId != null) {
+            posts = postService.getAuthorPostsSortedBy(authorId, sort, limit, offset);
+        } else {
+            posts = postService.getAllPostsSortedBy(sort, limit, offset);
+
+        }
+        // if (authorId != null) {
+        // if (sort != null && (sort.equals("createdAt") || sort.equals("commentQty")))
+        // {
+        // posts = postService.getAuthorPostsSortedBy(authorId, sort, limit, offset);
+        // } else {
+        // posts = postService.getAuthorPosts(authorId, limit, offset);
+        // }
+        // } else {
+        // if (sort != null && (sort.equals("createdAt") || sort.equals("commentQty")))
+        // {
+        // posts = postService.getAllPostsSortedBy(sort, limit, offset);
+        // } else {
+        // posts = postService.getAllPosts(limit, offset);
+        // }
+        // }
         return ResponseEntity.ok(posts);
     }
 

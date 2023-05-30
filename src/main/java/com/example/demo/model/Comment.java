@@ -41,6 +41,7 @@ public class Comment {
 
     @ManyToMany
     @JoinTable(name = "comment_replies", joinColumns = @JoinColumn(name = "comment_id"), inverseJoinColumns = @JoinColumn(name = "author_id"))
+    @JsonIgnore
     private List<Comment> replies;
 
     // Constructors, getters, setters, and other methods

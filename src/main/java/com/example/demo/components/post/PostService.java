@@ -12,6 +12,10 @@ import com.example.demo.model.Post;
 import com.example.demo.model.PostLikes;
 import com.example.demo.model.User;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -51,15 +55,42 @@ public class PostService {
     }
 
     // 取得全部文章資料
-    public List<PostDto> getAllPosts() {
-        List<Post> posts = postDao.findAll();
-        return mapping.PostsToDto(posts);
+    // public List<PostDto> getAllPosts() {
+    // List<Post> posts = postDao.findAll();
+    // return mapping.PostsToDto(posts);
+    // }
+    public List<PostDto> getAllPosts(int limit, int offset) {
+        Pageable pageable = PageRequest.of(offset, limit);
+        Page<Post> postPage = postDao.findAll(pageable);
+        return mapping.PostsToDto(postPage.getContent());
+    }
+
+    public List<PostDto> getAllPostsSortedBy(String sort, int limit, int offset) {
+        Pageable pageable = PageRequest.of(offset, limit, Sort.by(sort).descending());
+        Page<Post> postPage = postDao.findAll(pageable);
+        return mapping.PostsToDto(postPage.getContent());
+    }
+
+    public List<PostDto> getAuthorPostsSortedBy(int authorId, String sort, int limit, int offset) {
+        Pageable pageable = PageRequest.of(offset, limit, Sort.by(sort).descending());
+        Page<Post> postPage = postDao.findByAuthorId(authorId, pageable);
+        return mapping.PostsToDto(postPage.getContent());
+    }
+
+    public List<PostDto> getAuthorPosts(int authorId, int limit, int offset) {
+        Pageable pageable = PageRequest.of(offset, limit);
+        Page<Post> postPage = postDao.findByAuthorId(authorId, pageable);
+        return mapping.PostsToDto(postPage.getContent());
     }
 
     // 新增文章資料
     public PostDto createPost(PostDto postDto) {
         Post post = mapping.DtoToPost(postDto);
+        post.setCreatedAt(LocalDateTime.now());
+        post.setUpdatedAt(LocalDateTime.now());
         Post createdPost = postDao.save(post);
+        Optional<User> optionalUser = userDao.findById(postDto.getAuthorId());
+        createdPost.setAuthor(optionalUser.get());
         return mapping.PostToDto(createdPost);
     }
 
@@ -108,11 +139,13 @@ public class PostService {
     }
 
     // 取得文章全部評論
-    public List<CommentDto> getCommentsByPostId(int postId) {
+    public List<CommentDto> getCommentsByPostId(int postId, String sort, int limit, int offset) {
+
         Optional<Post> optionalPost = postDao.findById(postId);
         if (optionalPost.isPresent()) {
-            List<Comment> comments = commentDao.findByPostId(postId);
-            return mapping.CommentsToDto(comments);
+            Pageable pageable = PageRequest.of(offset, limit, Sort.by(sort).descending());
+            Page<Comment> comments = commentDao.findByPostId(postId, pageable);
+            return mapping.CommentsToDto(comments.getContent());
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Post not found");
         }
@@ -151,14 +184,14 @@ public class PostService {
     }
 
     // 編輯評論
-    public Comment editComment(int commentId, String comment1) {
+    public void editComment(int commentId, String comment1) {
         Optional<Comment> optionalcomment = commentDao.findById(commentId);
         if (optionalcomment.isPresent()) {
             Comment comment = optionalcomment.get();
             comment.setContent(comment1);
             comment.setUpdatedAt(LocalDateTime.now());
-            return commentDao.save(comment);
-        }
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Comment not found with ID: " + commentId);
+            commentDao.save(comment);
+        } else
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Comment not found with ID: " + commentId);
     }
 }

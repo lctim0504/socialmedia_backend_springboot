@@ -27,7 +27,7 @@ public class Mapping {
     }
 
     public List<TagDto> TagsToDto(List<Tag> tags) {
-        return tags.stream().map(this::TagToDto).collect(Collectors.toList());
+        return tags == null ? null : tags.stream().map(this::TagToDto).collect(Collectors.toList());
     }
 
     // ------------------------------users------------------------------
@@ -47,7 +47,7 @@ public class Mapping {
     }
 
     public List<UserDto> UsersToDto(List<User> users) {
-        return users.stream().map(this::UserToDto).collect(Collectors.toList());
+        return users == null ? null : users.stream().map(this::UserToDto).collect(Collectors.toList());
     }
 
     // ------------------------------posts------------------------------
@@ -55,6 +55,8 @@ public class Mapping {
         Post post = new Post();
         post.setContent(postDto.getContent());
         post.setAuthorId(postDto.getAuthorId());
+        post.setCreatedAt(postDto.getCreatedAt());
+        post.setUpdatedAt(postDto.getUpdatedAt());
         return post;
     }
 
@@ -75,12 +77,12 @@ public class Mapping {
     }
 
     public List<PostDto> PostsToDto(List<Post> posts) {
-        return posts.stream().map(this::PostToDto).collect(Collectors.toList());
+        return posts == null ? null : posts.stream().map(this::PostToDto).collect(Collectors.toList());
     }
 
     private CommentDto getLatestComment(Post post) {
         List<Comment> comments = post.getComments();
-        if (!comments.isEmpty()) {
+        if (comments != null && !comments.isEmpty()) {
             comments.sort(Comparator.comparing(Comment::getUpdatedAt).reversed());
             Comment latestComment = comments.get(0);
             return CommentToDto(latestComment);
@@ -108,6 +110,6 @@ public class Mapping {
     }
 
     public List<CommentDto> CommentsToDto(List<Comment> comments) {
-        return comments.stream().map(this::CommentToDto).collect(Collectors.toList());
+        return comments == null ? null : comments.stream().map(this::CommentToDto).collect(Collectors.toList());
     }
 }
